@@ -1,40 +1,40 @@
 0.
---список всех отношений
+--СЃРїРёСЃРѕРє РІСЃРµС… РѕС‚РЅРѕС€РµРЅРёР№
 
 tictactoe=> \d
 
-                          Список отношений
- Схема  |           Имя            |        Тип         | Владелец
+                          РЎРїРёСЃРѕРє РѕС‚РЅРѕС€РµРЅРёР№
+ РЎС…РµРјР°  |           РРјСЏ            |        РўРёРї         | Р’Р»Р°РґРµР»РµС†
 --------+--------------------------+--------------------+-----------
- public | all_players_results      | представление      | tictactoe
- public | games                    | таблица            | tictactoe
- public | games_id_seq             | последовательность | tictactoe
- public | games_player_one_id_seq  | последовательность | tictactoe
- public | games_player_two_id_seq  | последовательность | tictactoe
- public | moves                    | таблица            | tictactoe
- public | statistic_of_all_players | представление      | tictactoe
- public | top_5_players            | представление      | tictactoe
- public | users                    | таблица            | tictactoe
- public | users_id_seq             | последовательность | tictactoe
-(10 строк)
+ public | all_players_results      | РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ      | tictactoe
+ public | games                    | С‚Р°Р±Р»РёС†Р°            | tictactoe
+ public | games_id_seq             | РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ | tictactoe
+ public | games_player_one_id_seq  | РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ | tictactoe
+ public | games_player_two_id_seq  | РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ | tictactoe
+ public | moves                    | С‚Р°Р±Р»РёС†Р°            | tictactoe
+ public | statistic_of_all_players | РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ      | tictactoe
+ public | top_5_players            | РїСЂРµРґСЃС‚Р°РІР»РµРЅРёРµ      | tictactoe
+ public | users                    | С‚Р°Р±Р»РёС†Р°            | tictactoe
+ public | users_id_seq             | РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕСЃС‚СЊ | tictactoe
+(10 СЃС‚СЂРѕРє)
 
 
 
 1.
--- структура таблицы users
+-- СЃС‚СЂСѓРєС‚СѓСЂР° С‚Р°Р±Р»РёС†С‹ users
 
 tictactoe=> \d users;
 
-                                          Таблица "public.users"
- Столбец |        Тип        | Правило сортировки | Допустимость NULL |           По умолчанию
+                                          РўР°Р±Р»РёС†Р° "public.users"
+ РЎС‚РѕР»Р±РµС† |        РўРёРї        | РџСЂР°РІРёР»Рѕ СЃРѕСЂС‚РёСЂРѕРІРєРё | Р”РѕРїСѓСЃС‚РёРјРѕСЃС‚СЊ NULL |           РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 ---------+-------------------+--------------------+-------------------+-----------------------------------
  id      | integer           |                    | not null          | nextval('users_id_seq'::regclass)
  email   | character varying |                    | not null          |
  name    | character varying |                    | not null          |
-Индексы:
+РРЅРґРµРєСЃС‹:
     "users_pkey" PRIMARY KEY, btree (id)
     "unique_email" UNIQUE CONSTRAINT, btree (email)
-Ссылки извне:
+РЎСЃС‹Р»РєРё РёР·РІРЅРµ:
     TABLE "games" CONSTRAINT "games_player_one_id_fkey" FOREIGN KEY (player_one_id) REFERENCES users(id)
     TABLE "games" CONSTRAINT "games_player_two_id_fkey" FOREIGN KEY (player_two_id) REFERENCES users(id)
 
@@ -42,49 +42,49 @@ tictactoe=> \d users;
 
 
 2.
---структура таблицы games
+--СЃС‚СЂСѓРєС‚СѓСЂР° С‚Р°Р±Р»РёС†С‹ games
 
 tictactoe=> \d games;
 
-                                                  Таблица "public.games"
-    Столбец    |        Тип        | Правило сортировки | Допустимость NULL |                 По умолчанию
+                                                  РўР°Р±Р»РёС†Р° "public.games"
+    РЎС‚РѕР»Р±РµС†    |        РўРёРї        | РџСЂР°РІРёР»Рѕ СЃРѕСЂС‚РёСЂРѕРІРєРё | Р”РѕРїСѓСЃС‚РёРјРѕСЃС‚СЊ NULL |                 РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 ---------------+-------------------+--------------------+-------------------+----------------------------------------------
  id            | integer           |                    | not null          | nextval('games_id_seq'::regclass)
  player_one_id | integer           |                    | not null          | nextval('games_player_one_id_seq'::regclass)
  player_two_id | integer           |                    | not null          | nextval('games_player_two_id_seq'::regclass)
  result        | character varying |                    |                   |
-Индексы:
+РРЅРґРµРєСЃС‹:
     "games_pkey" PRIMARY KEY, btree (id)
-Ограничения внешнего ключа:
+РћРіСЂР°РЅРёС‡РµРЅРёСЏ РІРЅРµС€РЅРµРіРѕ РєР»СЋС‡Р°:
     "games_player_one_id_fkey" FOREIGN KEY (player_one_id) REFERENCES users(id)
     "games_player_two_id_fkey" FOREIGN KEY (player_two_id) REFERENCES users(id)
-Ссылки извне:
+РЎСЃС‹Р»РєРё РёР·РІРЅРµ:
     TABLE "moves" CONSTRAINT "moves_game_id_fkey" FOREIGN KEY (game_id) REFERENCES games(id)
 
 
 
 
 3. 
---структура таблицы moves
+--СЃС‚СЂСѓРєС‚СѓСЂР° С‚Р°Р±Р»РёС†С‹ moves
 
 tictactoe=> \d moves;
 
-                           Таблица "public.moves"
- Столбец  |   Тип   | Правило сортировки | Допустимость NULL | По умолчанию
+                           РўР°Р±Р»РёС†Р° "public.moves"
+ РЎС‚РѕР»Р±РµС†  |   РўРёРї   | РџСЂР°РІРёР»Рѕ СЃРѕСЂС‚РёСЂРѕРІРєРё | Р”РѕРїСѓСЃС‚РёРјРѕСЃС‚СЊ NULL | РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 ----------+---------+--------------------+-------------------+--------------
  game_id  | integer |                    | not null          |
  order    | integer |                    | not null          |
  position | integer |                    |                   |
-Индексы:
+РРЅРґРµРєСЃС‹:
     "moves_pkey" PRIMARY KEY, btree (game_id, "order")
-Ограничения внешнего ключа:
+РћРіСЂР°РЅРёС‡РµРЅРёСЏ РІРЅРµС€РЅРµРіРѕ РєР»СЋС‡Р°:
     "moves_game_id_fkey" FOREIGN KEY (game_id) REFERENCES games(id)
 
 
 
 
 4.
--- таблица users
+-- С‚Р°Р±Р»РёС†Р° users
 
 tictactoe=> SELECT * FROM users;
 
@@ -96,13 +96,13 @@ tictactoe=> SELECT * FROM users;
   4 | player_four@mail.ru  | player_four
   5 | player_five@mail.ru  | player_five
   6 | player_six@mail.ru   | player_six
-(6 строк)
+(6 СЃС‚СЂРѕРє)
 
 
 
 
 5.
---таблица games
+--С‚Р°Р±Р»РёС†Р° games
 
 tictactoe=> SELECT * FROM games;
 
@@ -124,7 +124,7 @@ tictactoe=> SELECT * FROM games;
  14 |             3 |             1 | X is win
  15 |             4 |             2 | O is win
  16 |             6 |             4 | O is win
-(16 строк)
+(16 СЃС‚СЂРѕРє)
 
 
 
@@ -138,27 +138,25 @@ tictactoe=> SELECT * FROM games;
 
 CREATE VIEW all_players_results AS
 
-SELECT player, results, COUNT(results) FROM (
+  SELECT player, results, COUNT(results) FROM (
 
- (SELECT player_one_id AS player,
- CASE WHEN result = 'X is win' THEN 'Win'
- WHEN result = 'O is win' THEN 'Fail'
- ELSE 'Draw'
- END AS results
- FROM games)
+     (SELECT player_one_id AS player,
+     CASE WHEN result = 'X is win' THEN 'Win'
+     WHEN result = 'O is win' THEN 'Fail'
+     ELSE 'Draw'
+     END AS results
+     FROM games)
 
-UNION ALL
+    UNION ALL
 
- (SELECT player_two_id AS player,
- CASE WHEN result = 'O is win' THEN 'Win'
- WHEN result = 'X is win' THEN 'Fail'
- ELSE 'Draw'
- END AS results
- FROM games)
+     (SELECT player_two_id AS player,
+     CASE WHEN result = 'O is win' THEN 'Win'
+     WHEN result = 'X is win' THEN 'Fail'
+     ELSE 'Draw'
+     END AS results
+     FROM games)
 
-) AS players
-GROUP BY player, results
-ORDER BY player;
+  ) AS players GROUP BY player, results ORDER BY player;
 
 
 
@@ -183,7 +181,7 @@ tictactoe=> SELECT * FROM all_players_results;
       5 | Fail    |     1
       5 | Win     |     1
       6 | Fail    |     1
-(14 строк)
+(14 СЃС‚СЂРѕРє)
 
 
 
@@ -217,7 +215,7 @@ SELECT player, results, COUNT(results) FROM (
       1 | Draw    |     2
       1 | Fail    |     3
       1 | Win     |     2
-(3 строки)
+(3 СЃС‚СЂРѕРєРё)
 
 
 
@@ -271,7 +269,7 @@ SELECT * FROM statistic_of_all_players;
       2 |            9 |          10 | 45.00
       1 |            6 |           7 | 42.86
       6 |            0 |           1 |  0.00
-(6 строк)
+(6 СЃС‚СЂРѕРє)
 
 
 
@@ -324,7 +322,7 @@ SELECT * FROM top_5_players;
       5 |            5 |           5 | 50.00
       2 |            9 |          10 | 45.00
       1 |            6 |           7 | 42.86
-(5 строк)
+(5 СЃС‚СЂРѕРє)
 
 
 
@@ -364,4 +362,5 @@ SELECT player, points_count, count_games, ROUND(50.0 * ((points_count * 1.0) / (
  player | points_count | count_games |  kd
 --------+--------------+-------------+-------
       1 |            6 |           7 | 42.86
-(1 строка)
+(1 СЃС‚СЂРѕРєР°)
+
