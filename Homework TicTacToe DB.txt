@@ -1,0 +1,367 @@
+0.
+--список всех отношений
+
+tictactoe=> \d
+
+                          Список отношений
+ Схема  |           Имя            |        Тип         | Владелец
+--------+--------------------------+--------------------+-----------
+ public | all_players_results      | представление      | tictactoe
+ public | games                    | таблица            | tictactoe
+ public | games_id_seq             | последовательность | tictactoe
+ public | games_player_one_id_seq  | последовательность | tictactoe
+ public | games_player_two_id_seq  | последовательность | tictactoe
+ public | moves                    | таблица            | tictactoe
+ public | statistic_of_all_players | представление      | tictactoe
+ public | top_5_players            | представление      | tictactoe
+ public | users                    | таблица            | tictactoe
+ public | users_id_seq             | последовательность | tictactoe
+(10 строк)
+
+
+
+1.
+-- структура таблицы users
+
+tictactoe=> \d users;
+
+                                          Таблица "public.users"
+ Столбец |        Тип        | Правило сортировки | Допустимость NULL |           По умолчанию
+---------+-------------------+--------------------+-------------------+-----------------------------------
+ id      | integer           |                    | not null          | nextval('users_id_seq'::regclass)
+ email   | character varying |                    | not null          |
+ name    | character varying |                    | not null          |
+Индексы:
+    "users_pkey" PRIMARY KEY, btree (id)
+    "unique_email" UNIQUE CONSTRAINT, btree (email)
+Ссылки извне:
+    TABLE "games" CONSTRAINT "games_player_one_id_fkey" FOREIGN KEY (player_one_id) REFERENCES users(id)
+    TABLE "games" CONSTRAINT "games_player_two_id_fkey" FOREIGN KEY (player_two_id) REFERENCES users(id)
+
+
+
+
+2.
+--структура таблицы games
+
+tictactoe=> \d games;
+
+                                                  Таблица "public.games"
+    Столбец    |        Тип        | Правило сортировки | Допустимость NULL |                 По умолчанию
+---------------+-------------------+--------------------+-------------------+----------------------------------------------
+ id            | integer           |                    | not null          | nextval('games_id_seq'::regclass)
+ player_one_id | integer           |                    | not null          | nextval('games_player_one_id_seq'::regclass)
+ player_two_id | integer           |                    | not null          | nextval('games_player_two_id_seq'::regclass)
+ result        | character varying |                    |                   |
+Индексы:
+    "games_pkey" PRIMARY KEY, btree (id)
+Ограничения внешнего ключа:
+    "games_player_one_id_fkey" FOREIGN KEY (player_one_id) REFERENCES users(id)
+    "games_player_two_id_fkey" FOREIGN KEY (player_two_id) REFERENCES users(id)
+Ссылки извне:
+    TABLE "moves" CONSTRAINT "moves_game_id_fkey" FOREIGN KEY (game_id) REFERENCES games(id)
+
+
+
+
+3. 
+--структура таблицы moves
+
+tictactoe=> \d moves;
+
+                           Таблица "public.moves"
+ Столбец  |   Тип   | Правило сортировки | Допустимость NULL | По умолчанию
+----------+---------+--------------------+-------------------+--------------
+ game_id  | integer |                    | not null          |
+ order    | integer |                    | not null          |
+ position | integer |                    |                   |
+Индексы:
+    "moves_pkey" PRIMARY KEY, btree (game_id, "order")
+Ограничения внешнего ключа:
+    "moves_game_id_fkey" FOREIGN KEY (game_id) REFERENCES games(id)
+
+
+
+
+4.
+-- таблица users
+
+tictactoe=> SELECT * FROM users;
+
+ id |        email         |     name
+----+----------------------+--------------
+  1 | player_one@mail.ru   | player_one
+  2 | player_two@mail.ru   | player_two
+  3 | player_three@mail.ru | player_three
+  4 | player_four@mail.ru  | player_four
+  5 | player_five@mail.ru  | player_five
+  6 | player_six@mail.ru   | player_six
+(6 строк)
+
+
+
+
+5.
+--таблица games
+
+tictactoe=> SELECT * FROM games;
+
+ id | player_one_id | player_two_id |  result
+----+---------------+---------------+----------
+  1 |             1 |             2 | X is win
+  2 |             1 |             3 | O is win
+  3 |             1 |             4 | X is win
+  4 |             1 |             5 | O is win
+  5 |             1 |             2 | Draw
+  6 |             2 |             5 | Draw
+  7 |             2 |             4 | O is win
+  8 |             2 |             1 | Draw
+  9 |             2 |             3 | Draw
+ 10 |             2 |             5 | Draw
+ 11 |             5 |             3 | Draw
+ 12 |             5 |             2 | O is win
+ 13 |             4 |             2 | X is win
+ 14 |             3 |             1 | X is win
+ 15 |             4 |             2 | O is win
+ 16 |             6 |             4 | O is win
+(16 строк)
+
+
+
+
+--					  	REQUESTS
+
+
+
+6. 
+--all_players_results (CREATE VIEW)
+
+CREATE VIEW all_players_results AS
+
+SELECT player, results, COUNT(results) FROM (
+
+ (SELECT player_one_id AS player,
+ CASE WHEN result = 'X is win' THEN 'Win'
+ WHEN result = 'O is win' THEN 'Fail'
+ ELSE 'Draw'
+ END AS results
+ FROM games)
+
+UNION ALL
+
+ (SELECT player_two_id AS player,
+ CASE WHEN result = 'O is win' THEN 'Win'
+ WHEN result = 'X is win' THEN 'Fail'
+ ELSE 'Draw'
+ END AS results
+ FROM games)
+
+) AS players
+GROUP BY player, results
+ORDER BY player;
+
+
+
+
+7.
+--all_players_results
+
+tictactoe=> SELECT * FROM all_players_results;
+ player | results | count
+--------+---------+-------
+      1 | Draw    |     2
+      1 | Fail    |     3
+      1 | Win     |     2
+      2 | Draw    |     5
+      2 | Fail    |     3
+      2 | Win     |     2
+      3 | Draw    |     2
+      3 | Win     |     2
+      4 | Fail    |     2
+      4 | Win     |     3
+      5 | Draw    |     3
+      5 | Fail    |     1
+      5 | Win     |     1
+      6 | Fail    |     1
+(14 строк)
+
+
+
+
+8.
+-- results of player_id = 1
+
+SELECT player, results, COUNT(results) FROM (
+
+  (SELECT player_one_id AS player, 
+  CASE WHEN result = 'X is win' THEN 'Win'
+  WHEN result = 'O is win' THEN 'Fail'
+  ELSE 'Draw'
+  END AS results
+  FROM games)
+  
+  UNION ALL
+  
+  (SELECT player_two_id AS player, 
+  CASE WHEN result = 'O is win' THEN 'Win'
+  WHEN result = 'X is win' THEN 'Fail'
+  ELSE 'Draw'
+  END AS results
+  FROM games)
+  
+) AS players WHERE player = 1 GROUP BY player, results ORDER BY player;
+
+
+ player | results | count
+--------+---------+-------
+      1 | Draw    |     2
+      1 | Fail    |     3
+      1 | Win     |     2
+(3 строки)
+
+
+
+
+9.
+--statistic_of_all_players (CREATE VIEW)
+
+CREATE VIEW statistic_of_all_players AS
+
+SELECT player, points_count, count_games, ROUND(50.0 * ((points_count * 1.0) / (count_games * 1.0)), 2 ) AS KD FROM (
+
+  SELECT player, SUM(points) AS points_count, SUM(game_count) AS count_games FROM (
+
+     SELECT player, results, COUNT(results) AS game_count, (results * COUNT(results)) AS points FROM (
+
+       (SELECT player_one_id AS player,
+       CASE WHEN result = 'X is win' THEN 2
+       WHEN result = 'O is win' THEN 0
+       ELSE 1
+       END AS results
+       FROM games)
+
+       UNION ALL
+
+       (SELECT player_two_id AS player,
+       CASE WHEN result = 'O is win' THEN 2
+       WHEN result = 'X is win' THEN 0
+       ELSE 1
+       END AS results
+       FROM games)
+
+     ) AS players GROUP BY player, results ORDER BY player
+
+   ) AS statistic GROUP BY player
+
+ ) AS statistics ORDER BY kd DESC;
+
+
+
+
+10.
+--Statistic of all players
+
+SELECT * FROM statistic_of_all_players;
+
+ player | points_count | count_games |  kd
+--------+--------------+-------------+-------
+      3 |            6 |           4 | 75.00
+      4 |            6 |           5 | 60.00
+      5 |            5 |           5 | 50.00
+      2 |            9 |          10 | 45.00
+      1 |            6 |           7 | 42.86
+      6 |            0 |           1 |  0.00
+(6 строк)
+
+
+
+
+11.
+--top_5_players (CREATE VIEW)
+
+CREATE VIEW top_5_players AS
+
+  SELECT player, points_count, count_games, ROUND(50.0 * ((points_count * 1.0) / (count_games * 1.0)), 2 ) AS KD FROM (
+
+    SELECT player, SUM(points) AS points_count, SUM(game_count) AS count_games FROM (
+
+      SELECT player, results, COUNT(results) AS game_count, (results * COUNT(results)) AS points FROM (
+
+        (SELECT player_one_id AS player, 
+        CASE WHEN result = 'X is win' THEN 2
+        WHEN result = 'O is win' THEN 0
+        ELSE 1
+        END AS results
+        FROM games)
+
+        UNION ALL
+
+        (SELECT player_two_id AS player, 
+        CASE WHEN result = 'O is win' THEN 2
+        WHEN result = 'X is win' THEN 0
+        ELSE 1
+        END AS results
+        FROM games)
+
+      ) AS players GROUP BY player, results ORDER BY player
+
+    ) AS statistic GROUP BY player
+
+  ) AS statistics ORDER BY kd DESC LIMIT 5;
+
+
+
+
+12.
+--TOP 5 players
+
+SELECT * FROM top_5_players;
+
+ player | points_count | count_games |  kd
+--------+--------------+-------------+-------
+      3 |            6 |           4 | 75.00
+      4 |            6 |           5 | 60.00
+      5 |            5 |           5 | 50.00
+      2 |            9 |          10 | 45.00
+      1 |            6 |           7 | 42.86
+(5 строк)
+
+
+
+
+13.
+--Statistic of player
+
+SELECT player, points_count, count_games, ROUND(50.0 * ((points_count * 1.0) / (count_games * 1.0)), 2 ) AS KD FROM (
+
+  SELECT player, SUM(points) AS points_count, SUM(game_count) AS count_games FROM (
+    
+    SELECT player, results, COUNT(results) AS game_count, (results * COUNT(results)) AS points FROM (
+  
+      (SELECT player_one_id AS player, 
+      CASE WHEN result = 'X is win' THEN 2
+      WHEN result = 'O is win' THEN 0
+      ELSE 1
+      END AS results
+      FROM games)
+      
+      UNION ALL
+      
+      (SELECT player_two_id AS player, 
+      CASE WHEN result = 'O is win' THEN 2
+      WHEN result = 'X is win' THEN 0
+      ELSE 1
+      END AS results
+      FROM games)
+    
+    ) AS players GROUP BY player, results ORDER BY player
+      
+  ) AS statistic GROUP BY player
+
+) AS statistics WHERE player = 1;
+
+
+ player | points_count | count_games |  kd
+--------+--------------+-------------+-------
+      1 |            6 |           7 | 42.86
+(1 строка)
