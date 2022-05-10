@@ -1,0 +1,54 @@
+
+-- create
+CREATE TABLE games (
+  id SERIAL PRIMARY KEY,
+  player_one_id INTEGER NOT NULL,
+  player_two_id INTEGER NOT NULL,
+  result VARCHAR 
+);
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  email VARCHAR,
+  name VARCHAR 
+);
+
+
+
+--constraint
+ALTER TABLE games ADD CONSTRAINT "games_player_one_id_fkey" FOREIGN KEY (player_one_id) REFERENCES users(id);
+ALTER TABLE games ADD CONSTRAINT "games_player_two_id_fkey" FOREIGN KEY (player_two_id) REFERENCES users(id);
+
+
+
+--check 
+--\d users
+--\d games
+
+
+
+-- insert
+INSERT INTO users (email, name) VALUES ('player_one@mail.ru', 'player_one');
+INSERT INTO users (email, name) VALUES ('player_two@mail.ru', 'player_two');
+INSERT INTO users (email, name) VALUES ('player_three@mail.ru', 'player_three');
+INSERT INTO users (email, name) VALUES ('player_four@mail.ru', 'player_four');
+INSERT INTO users (email, name) VALUES ('player_five@mail.ru', 'player_five');
+INSERT INTO users (email, name) VALUES ('player_six@mail.ru', 'player_six');
+
+
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (1, 2, 'X is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (1, 3, 'O is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (1, 4, 'X is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (1, 5, 'O is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (1, 2, 'Draw');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (2, 5, 'Draw');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (2, 4, 'O is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (2, 1, 'Draw');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (2, 3, 'Draw');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (2, 5, 'Draw');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (5, 3, 'Draw');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (5, 2, 'O is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (4, 2, 'X is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (3, 1, 'X is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (4, 2, 'O is win');
+INSERT INTO games (player_one_id, player_two_id, result) VALUES (6, 4, 'O is win');
